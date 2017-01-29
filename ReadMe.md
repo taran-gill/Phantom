@@ -6,6 +6,9 @@ The program is built for DeltaHacks 3, and is built using Python, OpenCV, and th
 
 ###Team:###
 [Frank Dong](https://github.com/frankdongers)
+
 [Kenneth Galang](https://github.com/kennygalang)
+
 [Taran Gill](https://github.com/taran-gill)
+
 [Michael Zhang](https://github.com/zhangm13)
