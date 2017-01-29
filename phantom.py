@@ -8,6 +8,11 @@ import os
 import ctypes
 import time
 
+#############SPEECH########################
+import speech_recognition as sr
+import re
+####################################
+
 root = Tk()
 root.configure(background="#a1dbcd")
 
@@ -28,6 +33,9 @@ def callback():
     user32.keybd_event(F5_KEYWORD,0,2,0) #is the code for KEYDOWN
     #######################################
 
+    #SPEECH DECLARE
+    r = sr.Recognizer()
+
     #What slide we are on currently
     wordCount = 0
 
@@ -43,6 +51,8 @@ def callback():
     END_SHOW = int ("0x1B", 16)
 
     while (vidCap.isOpened()):
+
+
         ret, img = vidCap.read()
         cv2.rectangle(img, (300,300),(100,510),(0,255,0),0)
         crop_img = img[100:300, 100:300]
@@ -88,6 +98,8 @@ def callback():
             #dist = cv2.pointPolygonTest(cnt,far,True)
             cv2.line(crop_img,start,end,[0,255,0],2)
             #cv2.circle(crop_img,far,5,[0,0,255],-1)
+
+        #Value comes out as 2
         if count_defects == 1:
             if old_count_defects != count_defects:
                 counter = 0
@@ -98,8 +110,9 @@ def callback():
                 check = 1
                 user32.keybd_event(FORWARD,0,0,0) #is the code for KEYDUP
                 user32.keybd_event(FORWARD,0,2,0) #is the code for KEYDOWN
-                print("1")
+                print("2")
 
+        #Value comes out as 3
         elif count_defects == 2:
             if old_count_defects != count_defects:
                 counter = 0
@@ -110,9 +123,9 @@ def callback():
                 check = 1
                 user32.keybd_event(BACK,0,0,0) #is the code for KEYDUP
                 user32.keybd_event(BACK,0,2,0) #is the code for KEYDOWN
-                print("2")
+                print("3")
 
-
+        #Value comes out as 4
         elif count_defects == 3:
             if old_count_defects != count_defects:
                 counter = 0
@@ -123,9 +136,11 @@ def callback():
                 check = 1
                 user32.keybd_event(END_SHOW,0,0,0) #is the code for KEYDUP
                 user32.keybd_event(END_SHOW,0,2,0) #is the code for KEYDOWN
-                print("3")
+                print("4")
 
-        elif count_defects == 4:
+        #Value comes as 5 (Speech)
+        elif count_defects >= 4:
+            print("5")
             if old_count_defects != count_defects:
                 counter = 0
             old_count_defects = 4
@@ -133,14 +148,47 @@ def callback():
             if counter > 30 and check == 0:
                 counter = 0
                 check = 1
+    ########################SPEECH###########################
+            #SPEECH#########################################################
+            with sr.Microphone(device_index = None, sample_rate = 15000, chunk_size = 908) as source:
+                r.adjust_for_ambient_noise(source)
+                r.pause_threshold = 0.5
+                print("Detecting Phrase...")
+                r.dynamic_energy_threshold = False
+                audio = r.listen(source)
+            ########################################################################
+            try:
+                speechWord = r.recognize_google(audio)
+                print (speechWord)
 
-                print("4")
+                #Checks ratio to see percentage match with voice recognition
+                ratio = SequenceMatcher(None, keywordsList[wordCount], speechWord).ratio()
+
+                splitValue = re.split('[a-zA-Z0-9]*' + keywordsList[wordCount], speechWord)
+                #If ratio is greater than .65 more forward 1 slide
+                print (splitValue)
+                if (ratio >= 0.65 or len(splitValue) > 1):
+                    wordCount = wordCount + 1
+                    user32.keybd_event(FORWARD,0,0,0) #is the code for KEYDUP
+                    user32.keybd_event(FORWARD,0,2,0) #is the code for KEYDOWN
+                    print ("Match")
+                    print ("->")
+            except sr.UnknownValueError:
+               print("Google Speech Recognition could not understand audio")
+            except sr.RequestError as e:
+               print("Could not request results from Google Speech Recognition service; {0}".format(e))
+            except sr.WaitTimeoutError:
+                print("Could not request results from Google Speech Recognition service; {0}".format(e))
+            except:
+                print("Error Caught")
+    #################################################################################
 
         else:
             if old_count_defects != count_defects:
                 counter = 0
             old_count_defects = 0
             check = 0
+
         #cv2.imshow('drawing', drawing)
         #cv2.imshow('end', crop_img)
         all_img = np.hstack((drawing, crop_img))
