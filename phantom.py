@@ -1,17 +1,14 @@
 import cv2, numpy as np, math, time
 from graphics import *
 from Tkinter import *
-from difflib import SequenceMatcher
 import time
-from tkFileDialog import askopenfilename
 import os
 import ctypes
 import time
-
-#############SPEECH########################
+from tkFileDialog import askopenfilename
+from difflib import SequenceMatcher
 import speech_recognition as sr
 import re
-####################################
 
 root = Tk()
 root.configure(background="#a1dbcd")
@@ -22,21 +19,19 @@ def callback():
     userInput = T.get("1.0",END)
     keywordsList = userInput.split("\n")
     keywordsList.pop()
-    ###Launch client/presentation mode###
-    ########################################
+
     count = len(keywordsList)
     os.system("start " + filename)
     time.sleep(2)
     user32 = ctypes.windll.user32
     F5_KEYWORD = int ("0x74", 16)
-    user32.keybd_event(F5_KEYWORD,0,0,0) #is the code for KEYDUP[/code]
-    user32.keybd_event(F5_KEYWORD,0,2,0) #is the code for KEYDOWN
-    #######################################
+    user32.keybd_event(F5_KEYWORD,0,0,0)
+    user32.keybd_event(F5_KEYWORD,0,2,0)
 
     #SPEECH DECLARE
     r = sr.Recognizer()
 
-    #What slide we are on currently
+    #What animation we are on currently
     wordCount = 0
 
     counter = 0
@@ -51,8 +46,6 @@ def callback():
     END_SHOW = int ("0x1B", 16)
 
     while (vidCap.isOpened()):
-
-
         ret, img = vidCap.read()
         cv2.rectangle(img, (300,300),(100,510),(0,255,0),0)
         crop_img = img[100:300, 100:300]
@@ -95,11 +88,9 @@ def callback():
             if angle <= 120:
                 count_defects += 1
                 cv2.circle(crop_img,far,1,[0,0,255],-1)
-            #dist = cv2.pointPolygonTest(cnt,far,True)
             cv2.line(crop_img,start,end,[0,255,0],2)
-            #cv2.circle(crop_img,far,5,[0,0,255],-1)
 
-        #Value comes out as 2
+        #Value 2
         if count_defects == 1:
             if old_count_defects != count_defects:
                 counter = 0
@@ -108,11 +99,11 @@ def callback():
             if counter > 30 and check == 0:
                 counter = 0
                 check = 1
-                user32.keybd_event(FORWARD,0,0,0) #is the code for KEYDUP
-                user32.keybd_event(FORWARD,0,2,0) #is the code for KEYDOWN
+                user32.keybd_event(FORWARD,0,0,0) 
+                user32.keybd_event(FORWARD,0,2,0)
                 print("2")
 
-        #Value comes out as 3
+        #Value 3
         elif count_defects == 2:
             if old_count_defects != count_defects:
                 counter = 0
@@ -121,11 +112,11 @@ def callback():
             if counter > 30 and check == 0:
                 counter = 0
                 check = 1
-                user32.keybd_event(BACK,0,0,0) #is the code for KEYDUP
-                user32.keybd_event(BACK,0,2,0) #is the code for KEYDOWN
+                user32.keybd_event(BACK,0,0,0)
+                user32.keybd_event(BACK,0,2,0)
                 print("3")
 
-        #Value comes out as 4
+        #Value 4
         elif count_defects == 3:
             if old_count_defects != count_defects:
                 counter = 0
@@ -134,11 +125,11 @@ def callback():
             if counter > 30 and check == 0:
                 counter = 0
                 check = 1
-                user32.keybd_event(END_SHOW,0,0,0) #is the code for KEYDUP
-                user32.keybd_event(END_SHOW,0,2,0) #is the code for KEYDOWN
+                user32.keybd_event(END_SHOW,0,0,0)
+                user32.keybd_event(END_SHOW,0,2,0)
                 print("4")
 
-        #Value comes as 5 (Speech)
+        #Value 5 (Speech)
         elif count_defects >= 4:
             print("5")
             if old_count_defects != count_defects:
@@ -148,15 +139,13 @@ def callback():
             if counter > 30 and check == 0:
                 counter = 0
                 check = 1
-    ########################SPEECH###########################
-            #SPEECH#########################################################
+                
             with sr.Microphone(device_index = None, sample_rate = 15000, chunk_size = 908) as source:
                 r.adjust_for_ambient_noise(source)
                 r.pause_threshold = 0.5
                 print("Detecting Phrase...")
                 r.dynamic_energy_threshold = False
                 audio = r.listen(source)
-            ########################################################################
             try:
                 speechWord = r.recognize_google(audio)
                 print (speechWord)
@@ -189,8 +178,6 @@ def callback():
             old_count_defects = 0
             check = 0
 
-        #cv2.imshow('drawing', drawing)
-        #cv2.imshow('end', crop_img)
         all_img = np.hstack((drawing, crop_img))
         cv2.imshow('Contours', all_img)
 
