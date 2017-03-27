@@ -1,4 +1,5 @@
 **Phantom**
+
 Phantom is a software that recognizes hand gestures and voice commands to manipulate programs,
 such as Microsoft PowerPoint to allow for accessibility and convenience.
 
@@ -19,5 +20,6 @@ The program is built for DeltaHacks 3, and is built using Python, OpenCV, and th
 Download Phantom [here](https://www.mediafire.com/?527gn4f2sxf7a24)
 
 **Pictures**
+
 ![overshoulder.jpg](https://s23.postimg.org/ennz2vchn/overshoulder.jpg)
 ![Demo.png](https://s23.postimg.org/jnkekcmd7/Demo.png)
